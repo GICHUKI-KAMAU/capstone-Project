@@ -17,11 +17,11 @@ model User {
   email     String    @unique
   name      String?
   password  String
-  role      String    // e.g., "student" or "instructor"
+  role      String  @default("student")
   profile   Profile?
-  courses   Course[]  @relation("CourseInstructor") // Courses they teach
+  courses   Course[]  @relation("CourseInstructor") 
   enrollments Enrollment[]
-  posts     Post[]    // Posts for forums, Q&A, etc.
+  posts     Post[]    
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -37,7 +37,7 @@ model Profile {
 
 model Course {
   id            Int          @id @default(autoincrement())
-  title         String       @db.VarChar(255)
+  title         String       @unique @db.VarChar(255)
   description   String?
   published     Boolean      @default(false)
   instructor    User         @relation("CourseInstructor", fields: [instructorId], references: [id])
@@ -57,7 +57,7 @@ model Enrollment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, courseId]) // Prevents duplicate enrollments
+  @@unique([userId, courseId]) 
 }
 
 model Assignment {
