@@ -1,14 +1,35 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { activeUser } from './AuthMiddleware';
 
-export const checkRole = (roles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user as JwtPayload & { role?: string }; 
+const isAdmin=async(req:Request,res:Response,next:NextFunction)=>{
+  const user=await  activeUser(req,res)
+  if(!user){
+    res.status(404).json({message:'User not found'})
+    return
+  }
+  console.log(user.role);
+  if(user.role!=='admin'){
+    res.status(404).json({message:'UnAuthorized Access: Audmin/instructor Role only'})
+    return
+  }
 
-    if (!user || !user.role || !roles.includes(user.role)) {
-      return res.status(403).json({ message: 'Forbidden: You do not have permission to access this resource.' });
-    }
+  next()
+}
 
-    next();
-  };
-};
+const isAInsructor=async(req:Request,res:Response,next:NextFunction)=>{
+  const user=await  activeUser(req,res)
+  if(!user){
+    res.status(404).json({message:'User not found'})
+    return
+  }
+  console.log(user.role);
+  if(user.role!=='admin'){
+    res.status(404).json({message:'UnAuthorized Access: Audmin/Instructor Role only'})
+    return
+  }
+
+  next()
+}
+
+export {isAdmin,isAInsructor}
